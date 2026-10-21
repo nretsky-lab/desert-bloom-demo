@@ -1,0 +1,18 @@
+{
+  "duration": 20.167,
+  "bounds": [
+    0.0,
+    5.042,
+    10.083,
+    15.125,
+    20.167
+  ],
+  "stills": {
+    "cleared": "aligned",
+    "shaped": "aligned",
+    "planted": "aligned",
+    "after": "aligned",
+    "style_cottage": "aligned",
+    "style_zen": "aligned"
+  }
+}

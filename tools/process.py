@@ -56,14 +56,14 @@ with open(f"{TMP}/list.txt", "w") as f:
 joined = f"{TMP}/joined.mp4"
 run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", f"{TMP}/list.txt", "-c", "copy", joined])
 
-for w, crf in ((1600, 23), (1280, 25)):
+for w, crf in ((1600, 25), (960, 26)):
     run(["ffmpeg", "-y", "-v", "error", "-i", joined, "-an", "-vf", f"scale={w}:-2:flags=lanczos",
          "-c:v", "libx264", "-preset", "slow", "-crf", str(crf), "-g", "4", "-keyint_min", "4", "-sc_threshold", "0",
          "-bf", "0", "-pix_fmt", "yuv420p", "-movflags", "+faststart", os.path.join(OUT, f"film_{w}.mp4")])
 
 run(["ffmpeg", "-y", "-v", "error", "-i", joined, "-frames:v", "1", "-vf", "scale=1600:-2", "-q:v", "3", os.path.join(OUT, "poster.jpg")])
 run(["ffmpeg", "-y", "-v", "error", "-sseof", "-0.1", "-i", joined, "-frames:v", "1", "-vf", "scale=1600:-2", "-q:v", "3", os.path.join(OUT, "end.jpg")])
-run(["ffmpeg", "-y", "-v", "error", "-i", joined, "-vf", f"fps={max(1, round(16 / bounds[-1] * 1.0, 3))},scale=400:-2,tile=4x4", "-frames:v", "1", os.path.join(OUT, "qa_sheet.jpg")])
+run(["ffmpeg", "-y", "-v", "error", "-i", joined, "-vf", f"fps={round(24 / bounds[-1], 4)},scale=320:-2,tile=6x4", "-frames:v", "1", os.path.join(OUT, "qa_sheet.jpg")])
 
 # ---------- stills, aligned to "before" ----------
 stills = cfg.get("stills", {})

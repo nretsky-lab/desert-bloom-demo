@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Desert Bloom Yardworks</title>
+<meta name="description" content="Dead lawn to desert garden in eleven days. Scroll the build.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Desert Bloom Yardworks">
+<meta property="og:description" content="Dead lawn to desert garden in eleven days. Scroll the build.">
+<meta property="og:image" content="media/after.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#121110">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="preload" as="image" href="media/poster.jpg">
+<style>
+/* Layout: one long scroll. A sticky full-bleed film the visitor scrubs with the scroll wheel,
+   then a sequence of tools on a dusk-dark page. Single committed dark world: the yard at dusk. */
+:root {
+  color-scheme: dark;
+  --dusk: #121110;        /* page ground: the yard after the lights come on */
+  --dusk-2: #1b1917;      /* raised surface */
+  --line: #34302b;
+  --bone: #f1ece4;        /* primary text */
+  --dust: #a8a096;        /* secondary text */
+  --glow: #f4b860;        /* path-light amber, used once per view */
+  --agave: #8fb3a8;       /* blue-green of the agave, small accents */
+  --f-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --f-body: "Geist", "Helvetica Neue", system-ui, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --gutter-l: max(20px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(20px, env(safe-area-inset-right, 0px));
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--dusk); color: var(--bone); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+img, video { max-width: 100%; display: block; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+em { font-style: italic; color: var(--glow); }
+p { margin: 0; }
+a { color: inherit; }
+.label { font: 500 11px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dust); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+
+/* ---------- Nav ---------- */
+.nav { position: fixed; inset: 0 0 auto; z-index: 20; padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gutter-r) 14px var(--gutter-l);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: linear-gradient(180deg, rgb(10 9 8 / .55), transparent); }
+.brand { display: flex; align-items: center; gap: 10px; font: 500 15px/1 var(--f-body); text-decoration: none; }
+.brand svg { width: 22px; height: 22px; }
+.nav-links { display: flex; gap: 22px; font-size: 13px; color: var(--dust); }
+.nav-links a { text-decoration: none; }
+.nav-links a:hover { color: var(--bone); }
+.pill { font: 500 13px/1 var(--f-body); padding: 10px 16px; border-radius: 999px; background: var(--bone); color: #16130f; text-decoration: none; white-space: nowrap; }
+@media (max-width: 720px) { .nav-links { display: none; } }
+
+/* ---------- Film ---------- */
+.film { position: relative; height: 640vh; }
+.stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #0d0c0b; }
+.frame { position: absolute; inset: 0; transform-origin: 50% 46%; will-change: transform; }
+.frame video, .frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.frame img.still { opacity: 0; transition: opacity .35s linear; }
+.frame img.still.on { opacity: 1; }
+.shade { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(0deg, rgb(8 7 6 / .78) 0%, rgb(8 7 6 / .25) 34%, transparent 55%),
+              linear-gradient(90deg, rgb(8 7 6 / .45), transparent 45%); }
+
+.readout { position: absolute; top: calc(76px + env(safe-area-inset-top, 0px)); left: var(--gutter-l); display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font: 500 12px/1 var(--f-mono); padding: 9px 11px; border-radius: 8px; background: rgb(14 13 12 / .55); border: 1px solid rgb(255 255 255 / .12);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-variant-numeric: tabular-nums; }
+.chip b { font-weight: 500; color: var(--glow); }
+
+.copy { position: absolute; left: var(--gutter-l); right: var(--gutter-r); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); max-width: 620px; }
+.line { position: absolute; left: 0; bottom: 0; opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+.line.on { opacity: 1; transform: none; pointer-events: auto; }
+.line h1, .line h2 { font-size: clamp(44px, 7.4vw, 104px); line-height: .95; text-shadow: 0 2px 30px rgb(0 0 0 / .35); }
+.line p { margin-top: 14px; max-width: 42ch; color: rgb(241 236 228 / .82); font-size: 16px; }
+.line .cta { margin-top: 22px; display: inline-flex; gap: 10px; flex-wrap: wrap; }
+.btn { font: 500 14px/1 var(--f-body); padding: 14px 20px; border-radius: 999px; text-decoration: none; border: 1px solid rgb(255 255 255 / .35); color: var(--bone); background: rgb(14 13 12 / .35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.btn.solid { background: var(--glow); border-color: var(--glow); color: #1d1408; }
+
+.stages { position: absolute; left: var(--gutter-l); right: var(--gutter-r); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.stages div { display: grid; gap: 8px; }
+.stages span { font: 500 10.5px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(241 236 228 / .5); transition: color .3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stages i { display: block; height: 2px; background: rgb(255 255 255 / .18); border-radius: 2px; overflow: hidden; }
+.stages i::after { content: ""; display: block; height: 100%; width: calc(var(--f, 0) * 100%); background: var(--bone); }
+.stages .now span { color: var(--bone); }
+.hint { position: absolute; right: var(--gutter-r); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); font: 500 11px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: rgb(241 236 228 / .7); transition: opacity .4s; }
+.hint::after { content: ""; display: block; width: 1px; height: 34px; margin: 10px auto 0; background: linear-gradient(var(--bone), transparent); animation: drip 1.8s ease-in-out infinite; }
+@keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+/* ---------- Sections ---------- */
+.sec { padding-block: clamp(72px, 11vw, 140px); border-top: 1px solid var(--line); }
+.sec-head { display: grid; gap: 14px; max-width: 640px; margin-bottom: clamp(28px, 4vw, 48px); }
+.sec-head h2 { font-size: clamp(40px, 5.6vw, 72px); line-height: 1; }
+.sec-head p { color: var(--dust); max-width: 52ch; }
+
+/* Trust strip */
+.trust { display: grid; grid-template-columns: repeat(4, 1fr); border-block: 1px solid var(--line); }
+.trust div { padding: 22px 18px; display: grid; gap: 6px; }
+.trust div + div { border-left: 1px solid var(--line); }
+.trust b { font: 400 22px/1.1 var(--f-display); }
+.trust span { font-size: 13px; color: var(--dust); }
+@media (max-width: 760px) { .trust { grid-template-columns: 1fr 1fr; } .trust div:nth-child(3) { border-left: 0; } .trust div:nth-child(n+3) { border-top: 1px solid var(--line); } }
+
+/* Pick your style */
+.styles { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
+.viewer { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 14px; overflow: hidden; background: var(--dusk-2); }
+.viewer img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .7s ease; }
+.viewer img.on { opacity: 1; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.tab { font: 500 13px/1 var(--f-body); padding: 11px 15px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--dust); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--bone); color: #16130f; border-color: var(--bone); }
+.style-copy h3 { font-size: 34px; line-height: 1.05; }
+.style-copy p { color: var(--dust); margin-top: 10px; }
+.specs { margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.specs li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.specs li span:last-child { font-family: var(--f-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .styles { grid-template-columns: 1fr; } }
+
+/* Compare */
+.ba { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 14px; overflow: hidden; user-select: none; touch-action: pan-y; background: var(--dusk-2); }
+.ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ba .after { clip-path: inset(0 0 0 var(--cut, 50%)); }
+.ba .tag { position: absolute; top: 14px; font: 500 11px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; padding: 8px 10px; border-radius: 6px; background: rgb(14 13 12 / .6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.ba .tag.l { left: 14px; } .ba .tag.r { right: 14px; }
+.ba .bar { position: absolute; top: 0; bottom: 0; left: var(--cut, 50%); width: 2px; margin-left: -1px; background: var(--bone); pointer-events: none; }
+.ba .knob { position: absolute; top: 50%; left: var(--cut, 50%); width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--bone); color: #16130f; display: grid; place-items: center; pointer-events: none; box-shadow: 0 6px 20px rgb(0 0 0 / .35); }
+.ba input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+.cap { margin-top: 12px; font: 400 12px/1.4 var(--f-mono); color: var(--dust); }
+
+/* Price */
+.price { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: clamp(20px, 4vw, 56px); align-items: start; }
+.field { display: grid; gap: 10px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.field:first-child { border-top: 1px solid var(--line); }
+.field-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.field-top output { font: 400 26px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+input[type=range].slider { width: 100%; accent-color: var(--glow); }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button { font: 500 13px/1 var(--f-body); padding: 10px 13px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--dust); cursor: pointer; }
+.seg button[aria-pressed="true"] { border-color: var(--bone); color: var(--bone); background: var(--dusk-2); }
+.checks { display: grid; gap: 8px; }
+.checks label { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; cursor: pointer; }
+.checks label span:last-child { font-family: var(--f-mono); font-size: 12px; color: var(--dust); }
+.checks input { accent-color: var(--glow); width: 16px; height: 16px; margin: 0 10px 0 0; }
+.quote { position: sticky; top: 90px; padding: clamp(22px, 3vw, 34px); border-radius: 16px; background: var(--dusk-2); border: 1px solid var(--line); display: grid; gap: 14px; }
+.quote .big { font: 400 clamp(44px, 6vw, 68px)/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.quote .big em { font-style: normal; }
+.quote p { color: var(--dust); font-size: 14px; }
+.quote ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
+.quote li { display: flex; justify-content: space-between; gap: 12px; }
+.quote li span:last-child { font-family: var(--f-mono); font-size: 13px; color: var(--dust); }
+@media (max-width: 860px) { .price { grid-template-columns: 1fr; } .quote { position: static; } }
+
+/* Contact */
+.contact h2 { font-size: clamp(46px, 7vw, 96px); line-height: .95; max-width: 14ch; }
+.copyrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 32px; }
+.copyrow div { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.copyrow span { font: 500 15px/1.2 var(--f-mono); user-select: all; overflow-wrap: anywhere; }
+.copyrow button { font: 500 12px/1 var(--f-body); padding: 9px 12px; border-radius: 8px; border: 0; background: var(--bone); color: #16130f; cursor: pointer; }
+footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); font-size: 12px; color: var(--dust); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21V9m0 0c0-3 2-5 5-5 0 3-2 5-5 5Zm0 3c0-2.5-1.7-4.5-4.5-4.5 0 2.5 1.8 4.5 4.5 4.5Z" stroke="#f4b860" stroke-width="1.6" stroke-linecap="round"/><path d="M5 21h14" stroke="#f1ece4" stroke-width="1.6" stroke-linecap="round"/></svg>
+    Desert Bloom
+  </a>
+  <div class="nav-links"><a href="#styles">Styles</a><a href="#compare">Before &amp; after</a><a href="#price">Pricing</a></div>
+  <a class="pill" href="#contact">Free design</a>
+</nav>
+
+<!-- ============ Scroll film ============ -->
+<section class="film" id="top" aria-label="Watch a front yard makeover by scrolling">
+  <div class="stage">
+    <div class="frame" id="frame">
+      <img class="still on" data-k="0" src="media/before.jpg" alt="">
+      <img class="still" data-k="1" src="media/cleared.jpg" alt="" loading="lazy">
+      <img class="still" data-k="2" src="media/shaped.jpg" alt="" loading="lazy">
+      <img class="still" data-k="3" src="media/planted.jpg" alt="" loading="lazy">
+      <img class="still" data-k="4" src="media/after.jpg" alt="" loading="lazy">
+      <video id="film" muted playsinline preload="auto" poster="media/poster.jpg" aria-hidden="true"></video>
+    </div>
+    <div class="shade"></div>
+
+    <div class="readout" aria-hidden="true">
+      <span class="chip">Day <b id="day">0</b> / 11</span>
+      <span class="chip">Outdoor water <b id="water">100%</b></span>
+    </div>
+
+    <div class="copy">
+      <div class="line on" data-c="0"><span class="label">Palm Desert · Front yard</span><h1 style="margin-top:12px">Your lawn drinks more than <em>you do.</em></h1><p>Patchy, brown, and still on the sprinklers every morning. Scroll to watch it change.</p></div>
+      <div class="line" data-c="1"><h2>Out it <em>comes.</em></h2><p>Turf cut and hauled. The old walk broken out. Soil graded so water runs away from the house.</p></div>
+      <div class="line" data-c="2"><h2>Paths <em>first.</em></h2><p>A curving decomposed granite walk, flagstone edging and boulders set by hand. Drip lines go in before a single plant.</p></div>
+      <div class="line" data-c="3"><h2>Then the <em>green.</em></h2><p>Agave, Texas sage, feather grass and barrel cactus. Every plant on its own drip emitter.</p></div>
+      <div class="line" data-c="4"><h2>Your yard, <em>finished.</em></h2><p>Eleven days. Path lights on a dusk timer. About a third of the water.</p><div class="cta"><a class="btn solid" href="#contact">Get a free design</a><a class="btn" href="#styles">Pick a style</a></div></div>
+    </div>
+
+    <div class="hint" id="hint">Scroll</div>
+    <div class="stages" id="stages" aria-hidden="true">
+      <div><span>Dead lawn</span><i></i></div>
+      <div><span>Clear</span><i></i></div>
+      <div><span>Shape</span><i></i></div>
+      <div><span>Plant</span><i></i></div>
+      <div><span>Light</span><i></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Trust ============ -->
+<div class="wrap" style="padding-block:28px">
+  <div class="trust">
+    <div><b>811 called first</b><span>Every dig is utility-marked before demo day.</span></div>
+    <div><b>Drip, not spray</b><span>Pressure-regulated emitters on a smart timer.</span></div>
+    <div><b>HOA plan sets</b><span>Drawn plans and plant lists ready for approval.</span></div>
+    <div><b>1-year plant guarantee</b><span>If it doesn't take, we replace it.</span></div>
+  </div>
+</div>
+
+<!-- ============ Styles ============ -->
+<section class="sec" id="styles">
+  <div class="wrap">
+    <div class="sec-head"><span class="label">Same house, three yards</span><h2>Pick your <em>style.</em></h2></div>
+    <div class="styles">
+      <div class="viewer" id="viewer">
+        <img class="on" data-s="desert" src="media/after.jpg" alt="Finished front yard in the Desert Modern style">
+        <img data-s="cottage" src="media/style_cottage.jpg" alt="The same front yard in the Cottage Bloom style" loading="lazy">
+        <img data-s="zen" src="media/style_zen.jpg" alt="The same front yard in the Zen Gravel style" loading="lazy">
+      </div>
+      <div class="style-copy">
+        <div class="tabs" role="tablist" aria-label="Yard styles">
+          <button class="tab" role="tab" id="t-desert" aria-selected="true" data-s="desert">Desert Modern</button>
+          <button class="tab" role="tab" id="t-cottage" aria-selected="false" data-s="cottage">Cottage Bloom</button>
+          <button class="tab" role="tab" id="t-zen" aria-selected="false" data-s="zen">Zen Gravel</button>
+        </div>
+        <div id="style-text"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Compare ============ -->
+<section class="sec" id="compare">
+  <div class="wrap">
+    <div class="sec-head"><span class="label">Drag to compare</span><h2>Same house. <em>Eleven days</em> apart.</h2></div>
+    <div class="ba" id="ba">
+      <img src="media/before.jpg" alt="Front yard before: dead lawn and cracked walkway">
+      <img class="after" src="media/after.jpg" alt="Front yard after: desert garden with lit path">
+      <span class="tag l">Before</span><span class="tag r">After</span>
+      <div class="bar"></div><div class="knob" aria-hidden="true">&#8596;</div>
+      <input id="ba-range" type="range" min="0" max="100" value="50" step="0.1" aria-label="Compare before and after">
+    </div>
+    <p class="cap">Illustration of a typical Full Makeover.</p>
+  </div>
+</section>
+
+<!-- ============ Price ============ -->
+<section class="sec" id="price">
+  <div class="wrap">
+    <div class="sec-head"><span class="label">Instant estimate</span><h2>Price your yard in <em>twenty seconds.</em></h2><p>Rough numbers for planning. Your real quote comes after a free site walk.</p></div>
+    <div class="price">
+      <div>
+        <div class="field">
+          <div class="field-top"><label for="sqft">Front yard size</label><output id="sqft-out" for="sqft">900 sq ft</output></div>
+          <input class="slider" id="sqft" type="range" min="200" max="3000" step="50" value="900">
+        </div>
+        <div class="field">
+          <span>Package</span>
+          <div class="seg" id="pkg">
+            <button type="button" data-p="refresh" aria-pressed="false">Refresh</button>
+            <button type="button" data-p="full" aria-pressed="true">Full makeover</button>
+            <button type="button" data-p="signature" aria-pressed="false">Signature</button>
+          </div>
+        </div>
+        <div class="field">
+          <span>Add-ons</span>
+          <div class="checks">
+            <label><span><input type="checkbox" id="ao-lights" checked>Path lighting</span><span>+$1,400</span></label>
+            <label><span><input type="checkbox" id="ao-creek">Dry creek bed</span><span>+$1,100</span></label>
+            <label><span><input type="checkbox" id="ao-boulders">Extra boulders</span><span>+$650</span></label>
+          </div>
+        </div>
+      </div>
+      <aside class="quote" aria-live="polite">
+        <span class="label">Estimated range</span>
+        <div class="big" id="range">$0</div>
+        <ul id="lines"></ul>
+        <p>Most yards this size are finished in <span id="days">11</span> working days.</p>
+        <a class="btn solid" href="#contact" style="justify-self:start">Lock in a site walk</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Contact ============ -->
+<section class="sec contact" id="contact">
+  <div class="wrap">
+    <span class="label">Free design consult</span>
+    <h2 style="margin-top:16px">Send a photo of your yard. We'll send back a <em>plan.</em></h2>
+    <div class="copyrow">
+      <div><span>(555) 014-2290</span><button type="button" data-copy="(555) 014-2290">Copy</button></div>
+      <div><span>hello@desertbloom.example</span><button type="button" data-copy="hello@desertbloom.example">Copy</button></div>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">Sample brochure with invented business details and AI-generated imagery. Built as a demo.</div></footer>
+
+<script>
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+  /* ================= Scroll film ================= */
+  const film = $('#film'), frame = $('#frame'), section = $('.film');
+  const lines = $$('.line'), stageEls = $$('#stages > div'), stills = $$('.still');
+  const dayEl = $('#day'), waterEl = $('#water'), hint = $('#hint');
+  // Timeline: chapter 0 holds on the "before" frame, chapters 1-4 each play one clip.
+  const HOLD_START = 0.08, HOLD_END = 0.10;
+  let bounds = [0, 5, 10, 15, 20]; // clip boundaries in seconds; replaced by media/manifest.json
+  let videoOK = false, target = 0, shown = 0;
+
+  film.src = innerWidth > 900 ? 'media/film_1600.mp4' : 'media/film_1280.mp4';
+  fetch('media/manifest.json').then(r => r.json()).then(m => { if (m.bounds && m.bounds.length === 5) bounds = m.bounds; }).catch(() => {});
+  const unlock = () => { film.play().then(() => film.pause()).catch(() => {}); };
+  film.addEventListener('loadeddata', () => { videoOK = true; frame.classList.add('has-video'); stills.forEach(s => s.style.display = 'none'); });
+  film.addEventListener('error', () => { videoOK = false; film.style.display = 'none'; });
+  addEventListener('touchstart', unlock, { once: true, passive: true });
+  unlock();
+
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  function progress() {
+    const r = section.getBoundingClientRect();
+    return clamp(-r.top / (r.height - innerHeight));
+  }
+  // p (0-1) -> chapter index + fraction through that chapter's clip
+  function map(p) {
+    if (p < HOLD_START) return { ch: 0, f: p / HOLD_START, t: 0 };
+    if (p > 1 - HOLD_END) return { ch: 4, f: 1, t: bounds[4] };
+    const q = (p - HOLD_START) / (1 - HOLD_START - HOLD_END); // 0-1 across the four clips
+    const seg = Math.min(3, Math.floor(q * 4)), f = q * 4 - seg;
+    return { ch: seg + 1, f, t: bounds[seg] + f * (bounds[seg + 1] - bounds[seg]) };
+  }
+  let lastCh = -1;
+  function render() {
+    const p = progress(), m = map(p);
+    target = m.t;
+    // camera push-in across the whole film
+    if (!reduced) frame.style.transform = `scale(${1 + 0.12 * p}) translateY(${p * -1.2}%)`;
+    // chapter copy + stage bar
+    const ch = m.ch === 4 || (m.ch > 0 && m.f > 0.18) ? m.ch : Math.max(0, m.ch - 1);
+    if (ch !== lastCh) { lines.forEach((l, i) => l.classList.toggle('on', i === ch)); lastCh = ch; }
+    stageEls.forEach((el, i) => {
+      const fill = i < m.ch ? 1 : i === m.ch ? m.f : 0;
+      el.querySelector('i').style.setProperty('--f', i === 0 && m.ch > 0 ? 1 : fill);
+      el.classList.toggle('now', i === m.ch);
+    });
+    // readouts
+    const overall = clamp((p - HOLD_START) / (1 - HOLD_START - HOLD_END));
+    dayEl.textContent = Math.round(overall * 11);
+    waterEl.textContent = Math.round(100 - overall * 64) + '%';
+    hint.style.opacity = p > 0.02 ? 0 : 1;
+    // still fallback when the video can't play
+    if (!videoOK) { const k = m.ch === 0 ? 0 : (m.f > 0.5 ? m.ch : m.ch - 1); stills.forEach(s => s.classList.toggle('on', +s.dataset.k === k)); }
+  }
+  // ease the video toward the scroll position so scrubbing feels like a dial, not a jump
+  function tick() {
+    if (videoOK && film.readyState >= 2) {
+      shown += (target - shown) * (reduced ? 1 : 0.18);
+      if (Math.abs(film.currentTime - shown) > 1 / 60) film.currentTime = shown;
+    }
+    requestAnimationFrame(tick);
+  }
+  addEventListener('scroll', render, { passive: true });
+  addEventListener('resize', render);
+  render(); requestAnimationFrame(tick);
+
+  /* ================= Styles ================= */
+  const STYLES = {
+    desert: { name: 'Desert Modern', body: 'Sculptural agave, purple sage and barrel cactus over tan granite. Clean lines that read from the street.', specs: [['Water use vs lawn', '−64%'], ['Plants', '38'], ['Upkeep', '2 hrs / month']] },
+    cottage: { name: 'Cottage Bloom', body: 'Softer and fuller. Flowering salvia, lantana and desert marigold spill over the path edges.', specs: [['Water use vs lawn', '−52%'], ['Plants', '61'], ['Upkeep', '4 hrs / month']] },
+    zen: { name: 'Zen Gravel', body: 'Raked grey gravel, a few specimen plants and flat stepping stones. Almost nothing to water.', specs: [['Water use vs lawn', '−81%'], ['Plants', '14'], ['Upkeep', '1 hr / month']] }
+  };
+  function pick(s) {
+    $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.s === s));
+    $$('#viewer img').forEach(i => i.classList.toggle('on', i.dataset.s === s));
+    const d = STYLES[s];
+    $('#style-text').innerHTML = `<h3>${d.name}</h3><p>${d.body}</p><ul class="specs">${d.specs.map(([a, b]) => `<li><span>${a}</span><span>${b}</span></li>`).join('')}</ul>`;
+  }
+  $$('.tab').forEach(t => t.addEventListener('click', () => pick(t.dataset.s)));
+  pick('desert');
+
+  /* ================= Compare ================= */
+  const ba = $('#ba'), range = $('#ba-range');
+  const cut = v => ba.style.setProperty('--cut', v + '%');
+  range.addEventListener('input', () => cut(range.value));
+  if (!reduced && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return; io.disconnect();
+      const s = performance.now();
+      (function step(now) { const k = Math.min(1, (now - s) / 1800); const v = 50 + Math.sin(k * Math.PI * 2) * 30 * (1 - k); cut(v); range.value = v; if (k < 1) requestAnimationFrame(step); })(s);
+    }, { threshold: 0.6 });
+    io.observe(ba);
+  }
+
+  /* ================= Price ================= */
+  const RATES = { refresh: [7, 11], full: [15, 21], signature: [25, 33] };
+  const ADDONS = { 'ao-lights': ['Path lighting', 1400], 'ao-creek': ['Dry creek bed', 1100], 'ao-boulders': ['Extra boulders', 650] };
+  let pkg = 'full';
+  const fmt = n => '$' + (Math.round(n / 50) * 50).toLocaleString('en-US');
+  function quote() {
+    const sq = +$('#sqft').value; $('#sqft-out').textContent = sq.toLocaleString('en-US') + ' sq ft';
+    const [lo, hi] = RATES[pkg]; let add = 0; const rows = [[`${$('#pkg [aria-pressed="true"]').textContent}, ${sq.toLocaleString('en-US')} sq ft`, `${fmt(sq * lo)}–${fmt(sq * hi)}`]];
+    for (const id in ADDONS) if ($('#' + id).checked) { add += ADDONS[id][1]; rows.push([ADDONS[id][0], fmt(ADDONS[id][1])]); }
+    $('#range').innerHTML = `${fmt(sq * lo + add)}<em>–</em>${fmt(sq * hi + add)}`;
+    $('#lines').innerHTML = rows.map(([a, b]) => `<li><span>${a}</span><span>${b}</span></li>`).join('');
+    $('#days').textContent = Math.max(4, Math.round(5 + sq / 220 + (pkg === 'signature' ? 3 : pkg === 'refresh' ? -3 : 0)));
+  }
+  $('#sqft').addEventListener('input', quote);
+  $$('#pkg button').forEach(b => b.addEventListener('click', () => { pkg = b.dataset.p; $$('#pkg button').forEach(x => x.setAttribute('aria-pressed', x === b)); quote(); }));
+  Object.keys(ADDONS).forEach(id => $('#' + id).addEventListener('change', quote));
+  quote();
+
+  /* ================= Copy ================= */
+  $$('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    const ok = () => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1500); };
+    const sel = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { navigator.clipboard.writeText(b.dataset.copy).then(ok, sel); } catch { sel(); }
+  }));
+})();
+</script>
+</body>
+</html>

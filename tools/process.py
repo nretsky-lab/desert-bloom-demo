@@ -47,16 +47,33 @@ for i, c in enumerate(clips):
     run(["ffmpeg", "-y", "-v", "error", "-i", c, "-an", "-vf", f"fps={fps},scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1",
          "-c:v", "libx264", "-crf", "14", "-preset", "fast", "-pix_fmt", "yuv420p", p])
     norm.append(p)
-bounds, t = [0.0], 0.0
-for p in norm:
-    t += duration(p)
-    bounds.append(round(t, 3))
-with open(f"{TMP}/list.txt", "w") as f:
-    f.writelines(f"file '{p}'\n" for p in norm)
+# Join with a short crossfade at every seam so cuts between shots never jump.
+XF = float(cfg.get("crossfade", 0.25))
+durs = [duration(p) for p in norm]
 joined = f"{TMP}/joined.mp4"
-run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", f"{TMP}/list.txt", "-c", "copy", joined])
+if len(norm) == 1 or XF <= 0:
+    with open(f"{TMP}/list.txt", "w") as f:
+        f.writelines(f"file '{p}'\n" for p in norm)
+    run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", f"{TMP}/list.txt", "-c", "copy", joined])
+    starts = [sum(durs[:i]) for i in range(len(durs))]
+    total = sum(durs)
+else:
+    inputs, chain, prev, offset, starts = [], [], "[0:v]", 0.0, [0.0]
+    for p in norm:
+        inputs += ["-i", p]
+    for i in range(1, len(norm)):
+        offset += durs[i - 1] - XF
+        starts.append(offset)
+        out = f"[x{i}]"
+        chain.append(f"{prev}[{i}:v]xfade=transition=fade:duration={XF}:offset={offset:.3f}{out}")
+        prev = out
+    total = offset + durs[-1]
+    run(["ffmpeg", "-y", "-v", "error", *inputs, "-filter_complex", ";".join(chain), "-map", prev,
+         "-c:v", "libx264", "-crf", "14", "-preset", "fast", "-pix_fmt", "yuv420p", joined])
+# chapter boundaries sit in the middle of each crossfade
+bounds = [0.0] + [round(s + XF / 2, 3) for s in starts[1:]] + [round(total, 3)]
 
-for w, crf in ((1600, 25), (960, 26)):
+for w, crf in ((1440, 26), (960, 27)):
     run(["ffmpeg", "-y", "-v", "error", "-i", joined, "-an", "-vf", f"scale={w}:-2:flags=lanczos",
          "-c:v", "libx264", "-preset", "slow", "-crf", str(crf), "-g", "4", "-keyint_min", "4", "-sc_threshold", "0",
          "-bf", "0", "-pix_fmt", "yuv420p", "-movflags", "+faststart", os.path.join(OUT, f"film_{w}.mp4")])

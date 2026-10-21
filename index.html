@@ -331,7 +331,7 @@ footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); bord
   let bounds = [0, 5, 10, 15, 20, 25, 30, 35, 40]; // clip boundaries in seconds; replaced by media/manifest.json
   let videoOK = false, target = 0, shown = 0;
 
-  film.src = innerWidth > 900 ? 'media/film_1600.mp4' : 'media/film_960.mp4';
+  film.src = innerWidth > 900 ? 'media/film_1440.mp4' : 'media/film_960.mp4';
   fetch('media/manifest.json').then(r => r.json()).then(m => { if (m.bounds && m.bounds.length >= 5) bounds = m.bounds; }).catch(() => {});
   const unlock = () => { film.play().then(() => film.pause()).catch(() => {}); };
   film.addEventListener('loadeddata', () => { videoOK = true; frame.classList.add('has-video'); stills.forEach(s => s.style.display = 'none'); });

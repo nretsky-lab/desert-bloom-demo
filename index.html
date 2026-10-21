@@ -332,7 +332,9 @@ footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); bord
   let videoOK = false, target = 0, shown = 0;
 
   film.src = innerWidth > 900 ? 'media/film_1440.mp4' : 'media/film_960.mp4';
-  fetch('media/manifest.json').then(r => r.json()).then(m => { if (m.bounds && m.bounds.length >= 5) bounds = m.bounds; }).catch(() => {});
+  fetch('media/manifest.json', { cache: 'no-store' }).then(r => r.json()).then(m => { if (m.bounds && m.bounds.length >= 5) bounds = m.bounds; }).catch(() => {});
+  // safety net: if the timing file and the film disagree, spread the film evenly across the clips
+  film.addEventListener('loadedmetadata', () => { if (film.duration && Math.abs(bounds[bounds.length - 1] - film.duration) > 0.5) { const n = bounds.length - 1; bounds = bounds.map((_, i) => film.duration * i / n); } });
   const unlock = () => { film.play().then(() => film.pause()).catch(() => {}); };
   film.addEventListener('loadeddata', () => { videoOK = true; frame.classList.add('has-video'); stills.forEach(s => s.style.display = 'none'); });
   film.addEventListener('error', () => { videoOK = false; film.style.display = 'none'; });

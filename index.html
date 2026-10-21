@@ -8,7 +8,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Desert Bloom Yardworks">
 <meta property="og:description" content="Dead lawn to desert garden in eleven days. Scroll the build.">
-<meta property="og:image" content="media/after.jpg">
+<meta property="og:image" content="https://desert-bloom-demo.vercel.app/media/after.jpg">
+<meta name="twitter:image" content="https://desert-bloom-demo.vercel.app/media/after.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#121110">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +49,8 @@ a { color: inherit; }
 /* ---------- Nav ---------- */
 .nav { position: fixed; inset: 0 0 auto; z-index: 20; padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gutter-r) 14px var(--gutter-l);
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  background: linear-gradient(180deg, rgb(10 9 8 / .55), transparent); }
+  background: linear-gradient(180deg, rgb(10 9 8 / .55), transparent); transition: background .3s, border-color .3s; border-bottom: 1px solid transparent; }
+.nav.solid { background: rgb(18 17 16 / .86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom-color: var(--line); }
 .brand { display: flex; align-items: center; gap: 10px; font: 500 15px/1 var(--f-body); text-decoration: none; }
 .brand svg { width: 22px; height: 22px; }
 .nav-links { display: flex; gap: 22px; font-size: 13px; color: var(--dust); }
@@ -61,7 +63,8 @@ a { color: inherit; }
 .film { position: relative; height: 640vh; }
 .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #0d0c0b; }
 .frame { position: absolute; inset: 0; transform-origin: 50% 46%; will-change: transform; }
-.frame video, .frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.frame video, .frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+@media (max-aspect-ratio: 1/1) { .frame video, .frame img { object-position: 50% 62%; } }
 .frame img.still { opacity: 0; transition: opacity .35s linear; }
 .frame img.still.on { opacity: 1; }
 .shade { position: absolute; inset: 0; pointer-events: none;
@@ -205,7 +208,7 @@ footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); bord
 
     <div class="hint" id="hint">Scroll</div>
     <div class="stages" id="stages" aria-hidden="true">
-      <div><span>Dead lawn</span><i></i></div>
+      <div><span>Lawn</span><i></i></div>
       <div><span>Clear</span><i></i></div>
       <div><span>Shape</span><i></i></div>
       <div><span>Plant</span><i></i></div>
@@ -323,6 +326,8 @@ footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); bord
   const dayEl = $('#day'), waterEl = $('#water'), hint = $('#hint');
   // Timeline: chapter 0 holds on the "before" frame, chapters 1-4 each play one clip.
   const HOLD_START = 0.08, HOLD_END = 0.10;
+  const nav = $('.nav');
+  const PUSH = innerWidth / innerHeight < 1 ? 0.04 : 0.12; // gentler camera push on portrait screens, where the frame is already cropped
   let bounds = [0, 5, 10, 15, 20]; // clip boundaries in seconds; replaced by media/manifest.json
   let videoOK = false, target = 0, shown = 0;
 
@@ -352,7 +357,8 @@ footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); bord
     const p = progress(), m = map(p);
     target = m.t;
     // camera push-in across the whole film
-    if (!reduced) frame.style.transform = `scale(${1 + 0.12 * p}) translateY(${p * -1.2}%)`;
+    if (!reduced) frame.style.transform = `scale(${1 + PUSH * p}) translateY(${p * -1.2 * PUSH / 0.12}%)`;
+    nav.classList.toggle('solid', section.getBoundingClientRect().bottom < innerHeight * 0.6);
     // chapter copy + stage bar
     const ch = m.ch === 4 || (m.ch > 0 && m.f > 0.18) ? m.ch : Math.max(0, m.ch - 1);
     if (ch !== lastCh) { lines.forEach((l, i) => l.classList.toggle('on', i === ch)); lastCh = ch; }

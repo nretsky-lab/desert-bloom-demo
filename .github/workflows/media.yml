@@ -1,0 +1,26 @@
+name: Build media
+on:
+  push:
+    paths: ["media.json", "tools/**", ".github/workflows/media.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  media:
+    runs-on: ubuntu-latest
+    if: hashFiles('media.json') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+          pip install -q opencv-python-headless numpy
+      - name: Download, align and encode
+        run: python3 tools/process.py
+      - name: Commit results
+        run: |
+          git config user.name "media-bot"
+          git config user.email "media-bot@users.noreply.github.com"
+          git add media
+          git diff --cached --quiet || git commit -m "Build media from media.json"
+          git push
